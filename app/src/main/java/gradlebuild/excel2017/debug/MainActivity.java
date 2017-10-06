@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new GalleryAdapter(getApplicationContext(), images);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        onCreate(Bundle.EMPTY);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
@@ -47,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new GalleryAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new GalleryAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Bundle bundle = new Bundle();
-
                 Intent intent=new Intent(getApplicationContext(),Main2Activity.class);
                 intent.putExtra("url",images.get(position));
                 startActivity(intent);
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         fetchImages();
 
-        //onCreate(Bundle.EMPTY);
 
     }
 
@@ -72,10 +70,31 @@ public class MainActivity extends AppCompatActivity {
         pDialog.setMessage("Downloading json...");
         pDialog.show();
 
+        /*Sample response format
+        [{
+            "name": "Deadpool",
+            "url": {
+                "small": "https://api.androidhive.info/images/glide/small/deadpool.jpg",
+                "medium": "https://api.androidhive.info/images/glide/medium/deadpool.jpg",
+                "large": "https://api.androidhive.info/images/glide/large/deadpool.jpg"
+            },
+            "timestamp": "February 12, 2016"
+        },
+        {
+            "name": "Batman vs Superman",
+            "url": {
+                "small": "https://api.androidhive.info/images/glide/small/bvs.png",
+                "medium": "https://api.androidhive.info/images/glide/medium/bvs.png",
+                "large": "https://api.androidhive.info/images/glide/large/bvs.png"
+            },
+            "timestamp": "March 25, 2016"
+        }]
+         */
+
         JsonArrayRequest req = new JsonArrayRequest(getString(R.string.downlink),
-                new Response.Listener<JSONArray>() {
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
                         pDialog.hide();
 
@@ -83,15 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject object = response.getJSONObject(i);
-
-//                                image.setName(object.getString("name"));
-
                                 JSONObject url = object.getJSONObject("url");
-//                                image.setSmall(url.getString("small"));
-//                                image.setMedium(url.getString("medium"));
-//                                image.setLarge(url.getString("large"));
-//                                image.setTimestamp(object.getString("timestamp"));
-
                                 images.add(url.getString("large"));
 
                             } catch (JSONException e) {
